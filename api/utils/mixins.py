@@ -1,10 +1,9 @@
 from django.contrib.auth import authenticate
 from rest_framework.viewsets import ModelViewSet
-from utils.perms import owner_only, ActiveUserOnly, AllowAny
 from utils.jwt import CustomJwtTokenAuthentication
 
 
-class BaseViewSet(ModelViewSet):
+class UserBaseViewSet(ModelViewSet):
 
     serializer_class = None
     read_serializer_class = None
