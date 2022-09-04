@@ -9,9 +9,6 @@ def owner_only(func):
 
         request = args[0]
 
-        print(f"args : {args}")
-        print(f"kwargs : {kwargs}")
-
         # logged_in_user = request.user
         logged_in_user = request.user
         target_id = kwargs.get("pk")
