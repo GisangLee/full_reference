@@ -31,7 +31,7 @@ def owner_only(func):
 
         if int(logged_in_user.id) != int(target_id):
             return Response(
-                Error.errors("권한이 없습니다"), status=status.HTTP_401_UNAUTHORIZED
+                Error.error("권한이 없습니다"), status=status.HTTP_401_UNAUTHORIZED
             )
 
         return func(*args, **kwargs)
