@@ -1,6 +1,9 @@
-from rest_framework import serializers
-from accounts import models as account_models
 import logging as log
+from rest_framework import serializers
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import update_last_login
+from accounts import models as account_models
+from utils.jwt import generate_jwt_token
 
 logger = log.getLogger("django.request")
 
@@ -98,3 +101,37 @@ class UserSerializer(serializers.ModelSerializer):
         new_user.save()
 
         return new_user
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=255)
+    password = serializers.CharField(max_length=255, write_only=True)
+
+    def validate(self, data):
+
+        username = data.get("username")
+        password = data.get("password")
+
+        user = authenticate(username=username, password=password)
+
+        if user is None:
+            response = {
+                "message": "등록된 사용자가 아닙니다. 회원가입을 진행해 주세요.",
+                "token": "",
+                "status": 400,
+                "user_id": user.id,
+            }
+            return response
+
+        payload = {"user_id": user.id}
+        access_jwt_token = generate_jwt_token(payload, "access")
+
+        update_last_login(None, user)
+
+        response = {
+            "message": "OK",
+            "token": access_jwt_token,
+            "status": 200,
+            "user_id": user.id,
+        }
+        return response
