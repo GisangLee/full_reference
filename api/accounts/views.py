@@ -18,8 +18,7 @@ from utils import mixins as util_mixins
 from utils.errors import Error
 from utils.success import Success
 from utils.swaggers.accounts import doc as swag_account_doc
-from utils.perms import owner_only, ActiveUserOnly, AllowAny
-from utils.jwt import CustomJwtTokenAuthentication
+from utils.perms import owner_only, AllowAny
 
 
 logger = log.getLogger("django.request")
@@ -32,7 +31,6 @@ class UserViewSet(util_mixins.BaseViewSet):
     )
     read_serializer_class = account_ser.ReadUserSerializer
     serializer_class = account_ser.UserSerializer
-    authentication_classes = [CustomJwtTokenAuthentication]
 
     filter_backends = [
         DjangoFilterBackend,
@@ -79,6 +77,8 @@ class UserViewSet(util_mixins.BaseViewSet):
         users = list(users)
 
         user_json = self.read_serializer_class(users, many=True)
+
+        print(f"list auth : {self.authentication_classes}")
 
         return Response(
             Success.response(
