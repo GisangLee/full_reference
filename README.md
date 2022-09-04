@@ -8,7 +8,7 @@
 - decorator를 활용한 소유자 전용 퍼미션 부여
 
 # 2. Middleware
-- HTTP Header에 서비스 키 (SHA256) 체크하여 API 접속 보안을 강화한 middleware 작성
+- HTTP Header에 인증키 (SHA256) 체크하여 API 접속 보안을 강화한 middleware 작성
 
 # 3. Auth
 - JWT 커스터마이즈
