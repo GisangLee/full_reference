@@ -5,3 +5,5 @@ sqlparse==0.4.2
 psycopg2
 djangorestframework
 django-request-logging
+Pillow
+django-filter

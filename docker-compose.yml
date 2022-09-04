@@ -25,8 +25,8 @@ services:
     depends_on:
       - db
 
-    # networks:
-    #   - full_ref_net
+    networks:
+      - full_ref_net
 
     command: >
       bash -c "
@@ -49,10 +49,9 @@ services:
     volumes:
       - ./postgres_data:/usr/src/Documents/dev/full_ref_backend/postgres_data
 
-    # networks:
-    #   - full_ref_net
+    networks:
+      - full_ref_net
 
 networks:
-  default:
-    external:
-      name: full_ref_net
+  full_ref_net:
+     driver: bridge
