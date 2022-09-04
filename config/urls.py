@@ -29,6 +29,7 @@ routers.register("accounts", account_views.UserViewSet, basename="accounts")
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api-v1/", include(routers.urls)),
+    path("api-v1/accounts/login", account_views.LoginView.as_view()),
     path("__debug__/", include("debug_toolbar.urls")),
 ]
 

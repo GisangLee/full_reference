@@ -168,3 +168,6 @@ LOGGING = {
 
 
 AUTH_USER_MODEL = "accounts.User"
+
+# Authentication Customizing
+AUTHENTICATION_BACKENDS = ("utils.login_auth.EmailUsernameLoginBackend",)
