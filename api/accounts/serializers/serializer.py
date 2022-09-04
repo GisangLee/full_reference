@@ -48,7 +48,7 @@ class ReadUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    profile = serializers.CharField()
+    profile = serializers.CharField(write_only=True, max_length=255)
 
     class Meta:
         model = account_models.User
