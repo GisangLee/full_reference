@@ -27,6 +27,7 @@ THIRD_PARTY_APPS = [
     "debug_toolbar",
     "rest_framework",
     "django_filters",
+    "drf_yasg",
 ]
 
 PROJ_APPS = [
