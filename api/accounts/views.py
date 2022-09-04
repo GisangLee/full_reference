@@ -4,6 +4,7 @@
 # Django Packages
 import logging as log
 from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from rest_framework import status
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
@@ -15,6 +16,7 @@ from utils import mixins as util_mixins
 from utils.errors import Error
 from utils.success import Success
 from utils.swaggers.accounts import doc as swag_account_doc
+from utils.perms import owner_only
 
 
 logger = log.getLogger("django.request")
@@ -54,23 +56,7 @@ class UserViewSet(util_mixins.BaseViewSet):
         users = self.get_queryset()
         users = list(users)
 
-        logger.debug(
-            {
-                "action": self.__class__.__name__,
-                "method": request.method,
-                "users": users,
-            }
-        )
-
         user_json = self.read_serializer_class(users, many=True)
-
-        logger.debug(
-            {
-                "action": self.__class__.__name__,
-                "method": request.method,
-                "user_json": user_json.data,
-            }
-        )
 
         return Response(
             Success.response(
@@ -88,14 +74,6 @@ class UserViewSet(util_mixins.BaseViewSet):
 
         new_user = self.serializer_class(data=request.data)
 
-        logger.debug(
-            {
-                "action": self.__class__.__name__,
-                "method": request.method,
-                "new_user": new_user,
-            }
-        )
-
         if new_user.is_valid():
             new_user.save()
             return Response(
@@ -105,14 +83,6 @@ class UserViewSet(util_mixins.BaseViewSet):
                 status=status.HTTP_201_CREATED,
             )
 
-        logger.debug(
-            {
-                "action": self.__class__.__name__,
-                "method": request.method,
-                "errors": new_user.errors,
-            }
-        )
-
         return Response(
             Error.error(new_user.errors), status=status.HTTP_400_BAD_REQUEST
         )
@@ -120,14 +90,6 @@ class UserViewSet(util_mixins.BaseViewSet):
     def retrieve(self, request, pk):
 
         query = self.__detail_queryset(pk)
-
-        logger.debug(
-            {
-                "action": self.__class__.__name__,
-                "method": request.method,
-                "query": query,
-            }
-        )
 
         if query is None:
 
@@ -137,16 +99,18 @@ class UserViewSet(util_mixins.BaseViewSet):
 
         user_json = self.read_serializer_class(query)
 
-        logger.debug(
-            {
-                "action": self.__class__.__name__,
-                "method": request.method,
-                "user_json": user_json,
-            }
-        )
-
         return Response(
             Success.response(
                 self.__class__.__name__, request.method, user_json.data, "200"
             )
         )
+
+    @method_decorator(owner_only, name="dispatch")
+    def partial_update(self, request, *args, **kwargs):
+
+        return super().partial_update(request, *args, **kwargs)
+
+    @method_decorator(owner_only, name="dispatch")
+    def update(self, request, *args, **kwargs):
+
+        return super().update(request, *args, **kwargs)
