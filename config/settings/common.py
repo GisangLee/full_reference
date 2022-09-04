@@ -26,6 +26,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "debug_toolbar",
     "rest_framework",
+    "django_filters",
 ]
 
 PROJ_APPS = [
@@ -33,6 +34,7 @@ PROJ_APPS = [
 ]
 
 MIDDLEWARE = [
+    "utils.middleware.ServiceHeaderMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -162,3 +164,6 @@ LOGGING = {
         },
     },
 }
+
+
+AUTH_USER_MODEL = "accounts.User"
