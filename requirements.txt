@@ -9,3 +9,9 @@ Pillow
 django-filter
 drf-yasg
 pyjwt
+pytest
+pytest-dotenv
+pytest-cov
+pytest-django
+pytest-xdist
+model_mommy
