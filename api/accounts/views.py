@@ -22,7 +22,9 @@ logger = log.getLogger("django.request")
 
 class UserViewSet(util_mixins.BaseViewSet):
 
-    queryset = account_models.User.objects.prefetch_related("profile_images").all()
+    queryset = account_models.User.objects.prefetch_related("profile_images").filter(
+        is_deleted=False
+    )
     read_serializer_class = account_ser.ReadUserSerializer
     serializer_class = account_ser.UserSerializer
 
