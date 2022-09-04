@@ -114,3 +114,19 @@ class UserViewSet(util_mixins.BaseViewSet):
     def update(self, request, *args, **kwargs):
 
         return super().update(request, *args, **kwargs)
+
+    @method_decorator(owner_only, name="dispatch")
+    def delete(self, request, *args, **kwargs):
+
+        logged_in_user = request.user
+
+        logged_in_user.is_deleted = True
+
+        logged_in_user.save()
+
+        return Response(
+            Success.response(
+                self.__class__.__name__, request.method, "계정이 탈퇴되었습니다.", "200"
+            ),
+            status=status.HTTP_200_OK,
+        )
