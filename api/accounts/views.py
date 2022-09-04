@@ -20,11 +20,10 @@ from utils.success import Success
 from utils.swaggers.accounts import doc as swag_account_doc
 from utils.perms import owner_only, AllowAny
 
-
 logger = log.getLogger("django.request")
 
 
-class UserViewSet(util_mixins.BaseViewSet):
+class UserViewSet(util_mixins.UserBaseViewSet):
 
     queryset = account_models.User.objects.prefetch_related("profile_images").filter(
         is_deleted=False
