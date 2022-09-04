@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework import permissions
 from rest_framework.response import Response
 from utils.errors import Error
 from accounts import models as account_models
@@ -21,3 +22,15 @@ def owner_only(func):
         return func(*args, **kwargs)
 
     return wrapper_func
+
+
+class ActiveUserOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+
+        return request.user.is_deleted == False
+
+
+class AllowAny(permissions.BasePermission):
+    def has_permission(self, request, view):
+
+        return True

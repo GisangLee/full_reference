@@ -29,3 +29,12 @@ INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + [
     "127.0.0.1",
     "10.0.2.2",
 ]
+
+
+# REST_FRAMEWORK = {
+#     # Use Django's standard `django.contrib.auth` permissions,
+#     # or allow read-only access for unauthenticated users.
+#     "DEFAULT_AUTHENTICATION_CLASSES": [
+#         "utils.jwt.CustomJwtTokenAuthentication",
+#     ],
+# }

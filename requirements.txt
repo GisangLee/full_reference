@@ -8,3 +8,4 @@ django-request-logging
 Pillow
 django-filter
 drf-yasg
+pyjwt

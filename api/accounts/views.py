@@ -5,8 +5,10 @@
 import logging as log
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
-from rest_framework import status
+from rest_framework import status, filters
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 
 # Custom Packages
@@ -16,7 +18,8 @@ from utils import mixins as util_mixins
 from utils.errors import Error
 from utils.success import Success
 from utils.swaggers.accounts import doc as swag_account_doc
-from utils.perms import owner_only
+from utils.perms import owner_only, ActiveUserOnly, AllowAny
+from utils.jwt import CustomJwtTokenAuthentication
 
 
 logger = log.getLogger("django.request")
@@ -29,6 +32,25 @@ class UserViewSet(util_mixins.BaseViewSet):
     )
     read_serializer_class = account_ser.ReadUserSerializer
     serializer_class = account_ser.UserSerializer
+    # authentication_classes = [CustomJwtTokenAuthentication]
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+
+    filterset_fields = [
+        "username",
+        "email",
+        "gender",
+        "is_deleted",
+        "is_superuser",
+        "phone_number",
+    ]
+
+    search_fields = ["username", "email"]
+    ordering_fields = ["pk", "username", "email", "gender", "is_deleted"]
 
     def get_queryset(self):
         return super().get_queryset()
@@ -130,3 +152,40 @@ class UserViewSet(util_mixins.BaseViewSet):
             ),
             status=status.HTTP_200_OK,
         )
+
+
+class LoginView(APIView):
+
+    permission_classes = [AllowAny]
+    serializer_classes = account_ser.LoginSerializer
+
+    def post(self, request):
+
+        print(f"req data : {request.data}")
+        user = self.serializer_classes(data=request.data)
+
+        if not user.is_valid():
+            print(user.errors)
+
+            return Response(Error.error("로그인 실패"), status=status.HTTP_400_BAD_REQUEST)
+
+        # 정상 로그인
+        else:
+
+            # 직렬화 로직 예외 처리
+            if user.validated_data["status"] == 400:
+
+                return Response(
+                    Error.error("로그인 실패"), status=status.HTTP_400_BAD_REQUEST
+                )
+
+            else:
+                return Response(
+                    Success.response(
+                        self.__class__.__name__,
+                        request.method,
+                        user.validated_data,
+                        "200",
+                    ),
+                    status=status.HTTP_200_OK,
+                )
