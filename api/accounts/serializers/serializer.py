@@ -18,7 +18,16 @@ class ReadUserProfileSerializer(serializers.ModelSerializer):
 
 class ReadUserSerializer(serializers.ModelSerializer):
 
-    profile = ReadUserProfileSerializer(read_only=True)
+    # profile = ReadUserProfileSerializer(
+    #     read_only=True, source="profile_images", many=True
+    # )
+
+    profile = serializers.SerializerMethodField()
+
+    def get_profile(self, obj):
+        images = obj.profile_images.all()
+        images = list(images)
+        return ReadUserProfileSerializer(images[:10], many=True).data
 
     class Meta:
         model = account_models.User
