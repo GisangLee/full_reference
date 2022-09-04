@@ -119,7 +119,7 @@ class LoginSerializer(serializers.Serializer):
                 "message": "등록된 사용자가 아닙니다. 회원가입을 진행해 주세요.",
                 "token": "",
                 "status": 400,
-                "user_id": user.id,
+                "user_id": "",
             }
             return response
 
