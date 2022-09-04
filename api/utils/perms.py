@@ -24,6 +24,12 @@ def owner_only(func):
     return wrapper_func
 
 
+class AdminOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+
+        return request.user.is_superuser == True
+
+
 class ActiveUserOnly(permissions.BasePermission):
     def has_permission(self, request, view):
 
