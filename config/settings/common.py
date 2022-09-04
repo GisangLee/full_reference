@@ -99,3 +99,63 @@ MEDIA_ROOT = os.path.join(PROJ_DIR, "media")
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+"""
+로거
+"""
+
+# Loggin 설정
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    # 형식정의
+    "formatters": {
+        "format1": {
+            "format": "[%(asctime)s] %(levelname)s %(message)s\n",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "format2": {
+            "format": "-----" * 25 + "\n%(levelname)s %(message)s [%(name)s:%(lineno)s]"
+        },
+    },
+    "handlers": {
+        # 파일 저장
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(PROJ_DIR, "logs/full_ref.log"),
+            "encoding": "UTF-8",
+            "maxBytes": 1024 * 1024 * 5,  # 5 MB
+            "backupCount": 5,
+            "formatter": "format1",
+        },
+        # 콘솔(터미널)에 출력
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "format2",
+        },
+    },
+    "loggers": {
+        "django.server": {
+            "level": "INFO",
+            "handlers": ["file", "console"],
+            "propagate": False,
+        },
+        "django.request": {
+            "level": "DEBUG",
+            "handlers": ["file", "console"],
+            "propagate": False,
+        },
+        "": {  # root
+            "level": "DEBUG",
+            "handlers": ["file"],
+            "propagate": True,
+        },
+        "django.db.backends": {
+            "handlers": ["file", "console"],
+            "level": "DEBUG",
+        },
+    },
+}
