@@ -1,10 +1,11 @@
-import os, dotenv
+import os, dotenv, sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJ_DIR = BASE_DIR.parent
 
+sys.path.insert(0, os.path.join(PROJ_DIR, "api"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -27,7 +28,9 @@ THIRD_PARTY_APPS = [
     "rest_framework",
 ]
 
-PROJ_APPS = []
+PROJ_APPS = [
+    "accounts",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
