@@ -42,6 +42,13 @@ class CustomJwtTokenAuthentication(object):
 
     user_model = get_user_model()
 
+    def __init__(self):
+        self.__JWT_SECRET = os.environ.get("SECRET_KEY")
+        self.__ALGORITHM = os.environ.get("JWT_ALGORITHM")
+
+    JWT_SECRET = os.environ.get("SECRET_KEY")
+    ALGORITHM = os.environ.get("JWT_ALGORITHM")
+
     def __get_authorization_header(self, request):
         auth = request.META.get("HTTP_AUTHORIZATION")
         return auth
@@ -49,19 +56,17 @@ class CustomJwtTokenAuthentication(object):
     def authenticate(self, request):
         token = self.__get_authorization_header(request)
 
+        if not token:
+            raise exceptions.AuthenticationFailed("사용자를 인증할 수 없습니다.")
+
+        token = token.replace("jwt ", "")
         logger.debug(
             {
                 "JWT": token,
             }
         )
-
-        if not token:
-            raise exceptions.AuthenticationFailed("사용자를 인증할 수 없습니다.")
-
-        token = token.replace("jwt ", "")
-
         # 토큰 디코딩
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, self.__JWT_SECRET, algorithms=self.__ALGORITHM)
 
         # 토큰 만료 데이터 파싱
         expire = payload.get("exp")

@@ -32,7 +32,7 @@ class UserViewSet(util_mixins.BaseViewSet):
     )
     read_serializer_class = account_ser.ReadUserSerializer
     serializer_class = account_ser.UserSerializer
-    # authentication_classes = [CustomJwtTokenAuthentication]
+    authentication_classes = [CustomJwtTokenAuthentication]
 
     filter_backends = [
         DjangoFilterBackend,
@@ -75,7 +75,7 @@ class UserViewSet(util_mixins.BaseViewSet):
     )
     def list(self, request):
 
-        users = self.get_queryset()
+        users = self.filter_queryset(self.get_queryset())
         users = list(users)
 
         user_json = self.read_serializer_class(users, many=True)
