@@ -36,21 +36,27 @@ class GenderChoices(models.TextChoices):
 class User(AbstractBaseUser):
     objects = UserManager()
 
-    username = models.CharField(max_length=20, unique=True)
-    email = models.EmailField(max_length=100)
+    username = models.CharField(max_length=20, unique=True, help_text="사용자 ID")
+    email = models.EmailField(max_length=100, help_text="사용자 이메일")
     gender = models.CharField(
-        max_length=10, choices=GenderChoices.choices, blank=True, null=True
+        max_length=10,
+        choices=GenderChoices.choices,
+        blank=True,
+        null=True,
+        help_text="성별",
     )
-    phone_number = models.CharField(max_length=255, blank=True, null=True)
-    age = models.PositiveIntegerField(blank=True, null=True)
+    phone_number = models.CharField(
+        max_length=255, blank=True, null=Truem, help_text="휴대폰 번호"
+    )
+    age = models.PositiveIntegerField(blank=True, null=True, help_text="나이")
 
-    is_deleted = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False, help_text="탈퇴 여부")
     is_superuser = models.BooleanField(default=False, help_text="시스템 관리자")
     is_admin = models.BooleanField(default=False, help_text="방 방장")
     is_manager = models.BooleanField(default=False, help_text="방 부방장")
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, help_text="계정 생성 일자")
+    updated_at = models.DateTimeField(auto_now=True, help_text="계정 수정 일자")
 
     USERNAME_FIELD = "username"
 
