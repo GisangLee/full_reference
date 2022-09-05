@@ -45,7 +45,9 @@ class User(AbstractBaseUser):
     age = models.PositiveIntegerField(blank=True, null=True)
 
     is_deleted = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False, help_text="시스템 관리자")
+    is_admin = models.BooleanField(default=False, help_text="방 방장")
+    is_manager = models.BooleanField(default=False, help_text="방 부방장")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

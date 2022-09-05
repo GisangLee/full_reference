@@ -38,14 +38,16 @@ class ReadUserSerializer(serializers.ModelSerializer):
             "pk",
             "username",
             "email",
+            "profile",
             "gender",
-            "phone_number",
             "age",
+            "phone_number",
             "is_deleted",
+            "is_admin",
+            "is_manager",
             "is_superuser",
             "created_at",
             "updated_at",
-            "profile",
         )
 
 
@@ -64,6 +66,8 @@ class UserSerializer(serializers.ModelSerializer):
             "age",
             "phone_number",
             "is_deleted",
+            "is_admin",
+            "is_manager",
             "is_superuser",
         )
 
