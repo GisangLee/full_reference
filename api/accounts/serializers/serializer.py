@@ -59,9 +59,12 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "email",
             "password",
+            "profile",
             "gender",
             "age",
-            "profile",
+            "phone_number",
+            "is_deleted",
+            "is_superuser",
         )
 
     def __does_user_exists(self, username):
