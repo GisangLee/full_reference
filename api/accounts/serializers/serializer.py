@@ -53,7 +53,9 @@ class ReadUserSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    profile = serializers.CharField(write_only=True, max_length=255)
+    profile = serializers.CharField(
+        write_only=True, max_length=255, help_text="프로필 이미지 주소"
+    )
 
     class Meta:
         model = account_models.User
