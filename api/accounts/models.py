@@ -46,7 +46,7 @@ class User(AbstractBaseUser):
         help_text="성별",
     )
     phone_number = models.CharField(
-        max_length=255, blank=True, null=Truem, help_text="휴대폰 번호"
+        max_length=255, blank=True, null=True, help_text="휴대폰 번호"
     )
     age = models.PositiveIntegerField(blank=True, null=True, help_text="나이")
 
