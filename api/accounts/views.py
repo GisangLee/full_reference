@@ -211,40 +211,12 @@ class TokenRefreshViewSet(util_mixins.UserBaseViewSet):
     def get_queryset(self):
         return super().get_queryset()
 
-    def get_detail_query(self, pk, refresh_token=None):
-
-        if refresh_token is None:
-            try:
-
-                refresh_token_from_db = (
-                    account_models.JwtRefreshToken.objects.select_related("user").get(
-                        pk=pk
-                    )
-                )
-
-                if refresh_token_from_db:
-
-                    user_id = refresh_token_from_db.user.pk
-
-                    payload = {"user_id": user_id}
-
-                    return jwt.generate_access_token_by_refresh_token(
-                        payload, refresh_token
-                    )
-
-            except account_models.JwtRefreshToken.DoesNotExist:
-
-                return Response(
-                    Error.error("갱신 토큰을 발급 받은 기록이 없습니다."),
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+    def get_detail_query(self, pk):
 
         try:
 
             refresh_token_from_db = (
-                account_models.JwtRefreshToken.objects.select_related("user").get(
-                    token=refresh_token
-                )
+                account_models.JwtRefreshToken.objects.select_related("user").get(pk=pk)
             )
 
             if refresh_token_from_db:
@@ -253,9 +225,7 @@ class TokenRefreshViewSet(util_mixins.UserBaseViewSet):
 
                 payload = {"user_id": user_id}
 
-                return jwt.generate_access_token_by_refresh_token(
-                    payload, refresh_token
-                )
+                return jwt.generate_access_token_by_refresh_token(payload)
 
         except account_models.JwtRefreshToken.DoesNotExist:
 
@@ -266,35 +236,18 @@ class TokenRefreshViewSet(util_mixins.UserBaseViewSet):
 
     def create(self, request, *args, **kwargs):
 
-        refresh_token = request.data.get("refresh_token", None)
+        pk = request.data.get("pk", None)
 
-        if refresh_token is None:
-
+        if pk is None or pk == "":
             return Response(
-                Error.error("refresh token이 필요합니다."), status=status.HTTP_400_BAD_REQUEST
+                Error.error("토큰 식별자가 필요합니다."), status=status.HTTP_400_BAD_REQUEST
             )
 
-        try:
-            is_exists_token = account_models.JwtRefreshToken.objects.select_related(
-                "user"
-            ).get(token=refresh_token)
+        new_access_token = self.get_detail_query(pk)
 
-            if is_exists_token:
-
-                user_id = is_exists_token.user.pk
-
-                payload = {"user_id": user_id}
-
-                new_access_token = jwt.generate_access_token_by_refresh_token(payload)
-
-                return Response(
-                    Success.response(
-                        self.__class__.__name__, request.method, new_access_token, "200"
-                    ),
-                    status=status.HTTP_200_OK,
-                )
-        except account_models.JwtRefreshToken.DoesNotExist:
-
-            return Response(
-                Error.error("갱신 토큰을 발급받은 적이 없습니다."), status=status.HTTP_400_BAD_REQUEST
-            )
+        return Response(
+            Success.response(
+                self.__class__.__name__, request.method, new_access_token, "201"
+            ),
+            status=status.HTTP_201_CREATED,
+        )

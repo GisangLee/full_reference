@@ -169,16 +169,11 @@ class LoginSerializer(serializers.Serializer):
 
 
 class JwtSerializer(serializers.ModelSerializer):
-    refresh_token = serializers.CharField(
-        write_only=True, help_text="jwt refresh 토큰", max_length=999
-    )
+    pk = serializers.CharField(write_only=True)
 
     class Meta:
         model = account_models.JwtRefreshToken
-        fields = (
-            "pk",
-            "refresh_token",
-        )
+        fields = ("pk",)
 
 
 class ReadJwtSerializer(serializers.ModelSerializer):
