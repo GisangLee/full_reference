@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from accounts import models as account_models
-from utils.jwt import generate_jwt_token
+from utils.jwt import generate_jwt_token, generate_access_token_by_refresh_token
 
 logger = log.getLogger("django.request")
 
@@ -166,3 +166,31 @@ class LoginSerializer(serializers.Serializer):
         }
 
         return response
+
+
+class JwtSerializer(serializers.ModelSerializer):
+    refresh_token = serializers.CharField(
+        write_only=True, help_text="jwt refresh 토큰", max_length=999
+    )
+
+    class Meta:
+        model = account_models.JwtRefreshToken
+        fields = (
+            "pk",
+            "refresh_token",
+        )
+
+
+class ReadJwtSerializer(serializers.ModelSerializer):
+
+    user = ReadUserSerializer()
+
+    class Meta:
+        model = account_models.JwtRefreshToken
+        fields = (
+            "pk",
+            "user",
+            "token",
+            "created_at",
+            "updated_at",
+        )
