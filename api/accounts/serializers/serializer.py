@@ -123,11 +123,25 @@ class LoginSerializer(serializers.Serializer):
 
     def __save_refresh_to_db(self, user, refresh_token: str) -> int:
 
-        refresh_token_instance = account_models.JwtRefreshToken.objects.create(
-            user=user, token=refresh_token
-        )
+        try:
 
-        return int(refresh_token_instance.pk)
+            exists_refresh_token = account_models.JwtRefreshToken.objects.get(
+                token=refresh_token
+            )
+
+            print(f"exists_refresh_token : {exists_refresh_token}")
+
+            if exists_refresh_token:
+
+                return exists_refresh_token.pk
+
+        except account_models.JwtRefreshToken.DoesNotExist:
+            print(f"없다고?")
+            refresh_token_instance = account_models.JwtRefreshToken.objects.create(
+                user=user, token=refresh_token
+            )
+
+            return refresh_token_instance.pk
 
     def validate(self, data):
 
