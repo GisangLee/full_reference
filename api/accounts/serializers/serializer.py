@@ -97,9 +97,6 @@ class UserSerializer(serializers.ModelSerializer):
             username=validate_data["username"], email=validate_data["email"]
         )
 
-        new_user.gender = validate_data["gender"]
-        new_user.age = validate_data["age"]
-
         if validate_data["profile"] is not None or validate_data["profile"] != "":
 
             account_models.UserProfile.objects.create(
@@ -107,6 +104,14 @@ class UserSerializer(serializers.ModelSerializer):
             )
 
         new_user.set_password(validate_data["password"])
+        new_user.gender = validate_data["gender"]
+        new_user.age = validate_data["age"]
+        new_user.phone_number = validate_data["phone_number"]
+        new_user.is_deleted = validate_data["is_deleted"]
+        new_user.is_admin = validate_data["is_admin"]
+        new_user.is_manager = validate_data["is_manager"]
+        new_user.is_superuser = validate_data["is_superuser"]
+
         new_user.save()
 
         return new_user
@@ -115,6 +120,14 @@ class UserSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255)
     password = serializers.CharField(max_length=255, write_only=True)
+
+    def __save_refresh_to_db(self, user, refresh_token: str) -> int:
+
+        refresh_token_instance = account_models.JwtRefreshToken.objects.create(
+            user=user, token=refresh_token
+        )
+
+        return int(refresh_token_instance.pk)
 
     def validate(self, data):
 
@@ -126,21 +139,30 @@ class LoginSerializer(serializers.Serializer):
         if user is None:
             response = {
                 "message": "등록된 사용자가 아닙니다. 회원가입을 진행해 주세요.",
-                "token": "",
+                "access_token": None,
+                "refresh_token": None,
                 "status": 400,
-                "user_id": "",
+                "user_id": None,
             }
             return response
 
         payload = {"user_id": user.id}
-        access_jwt_token = generate_jwt_token(payload, "access")
+        # access_jwt_token = generate_jwt_token(payload, "access")
 
+        jwt = generate_jwt_token(payload)
+
+        access_token = jwt.get("access_token")
+        refresh_token = jwt.get("refresh_token")
+
+        refresh_token_idx = self.__save_refresh_to_db(user, refresh_token)
         update_last_login(None, user)
 
         response = {
             "message": "OK",
-            "token": access_jwt_token,
+            "access_token": access_token,
+            "refresh_token": refresh_token_idx,
             "status": 200,
             "user_id": user.id,
         }
+
         return response

@@ -93,6 +93,8 @@ class UserViewSet(util_mixins.UserBaseViewSet):
     )
     def create(self, request, *args, **kwargs):
 
+        print(f"create auth : {self.authentication_classes}")
+
         new_user = self.serializer_class(data=request.data)
 
         if new_user.is_valid():
@@ -109,6 +111,8 @@ class UserViewSet(util_mixins.UserBaseViewSet):
         )
 
     def retrieve(self, request, pk):
+
+        print(f"retrieve auth : {self.authentication_classes}")
 
         query = self.__detail_queryset(pk)
 
@@ -128,16 +132,21 @@ class UserViewSet(util_mixins.UserBaseViewSet):
 
     @method_decorator(owner_only, name="dispatch")
     def partial_update(self, request, *args, **kwargs):
+        print(f"partial_update auth : {self.authentication_classes}")
 
         return super().partial_update(request, *args, **kwargs)
 
     @method_decorator(owner_only, name="dispatch")
     def update(self, request, *args, **kwargs):
 
+        print(f"update auth : {self.authentication_classes}")
+
         return super().update(request, *args, **kwargs)
 
     @method_decorator(owner_only, name="dispatch")
     def delete(self, request, *args, **kwargs):
+
+        print(f"delete auth : {self.authentication_classes}")
 
         logged_in_user = request.user
 

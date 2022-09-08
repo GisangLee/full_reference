@@ -1,3 +1,4 @@
+import copy
 import os, jwt, datetime, time
 from django.contrib.auth import get_user_model
 from rest_framework import exceptions
@@ -6,7 +7,19 @@ import logging as log
 logger = log.getLogger("django.request")
 
 # JWT 발급 시스템
-def generate_jwt_token(payload, type):
+def generate_jwt_token(payload):
+    # if type == "access":
+    #     # exp = datetime.datetime.now() + datetime.timedelta(seconds=3)
+    #     # 만료 토큰 생명 주기 일주일
+    #     exp = int(time.time()) + (DAY * 7)
+
+    # elif type == "refresh":
+    #     # 갱신 토큰 생명 주기 일년
+    #     exp = int(time.time()) + (YEAR)
+
+    # if type is None or type == "":
+    #     raise Exception("토큰 타입을 정확하게 명시해 주세요.")
+
     SECONDS = 1
     MINUTE = SECONDS * 60
     HOUR = MINUTE * 60
@@ -17,23 +30,31 @@ def generate_jwt_token(payload, type):
     JWT_SECRET = os.environ.get("SECRET_KEY")
     ALGORITHM = os.environ.get("JWT_ALGORITHM")
 
-    if type == "access":
-        # exp = datetime.datetime.now() + datetime.timedelta(seconds=3)
-        # 만료 토큰 생명 주기 한 달
-        exp = int(time.time()) + (MONTH)
+    access_token_expire_time = int(time.time()) + (DAY * 7)
+    refresh_token_expire_time = exp = int(time.time()) + (YEAR)
 
-    elif type == "refresh":
-        # 갱신 토큰 생명 주기 한 달 + 1주
-        exp = int(time.time()) + (MONTH + (DAY * 7))
+    access_payload = copy.deepcopy(payload)
+    refresh_payload = copy.deepcopy(payload)
 
-    else:
-        raise Exception("토큰 타입을 정확하게 명시해 주세요.")
+    # access token 인코딩
+    access_payload["exp"] = access_token_expire_time
+    access_payload["iat"] = datetime.datetime.now()
+    jwt_access_token_encoded = jwt.encode(
+        access_payload, JWT_SECRET, algorithm=ALGORITHM
+    )
 
-    payload["exp"] = exp
-    payload["iat"] = datetime.datetime.now()
-    jwt_encoded = jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
+    # refresh token 인코딩
+    refresh_payload["exp"] = refresh_token_expire_time
+    refresh_payload["iat"] = datetime.datetime.now()
+    jwt_refresh_token_encoded = jwt.encode(
+        refresh_payload, JWT_SECRET, algorithm=ALGORITHM
+    )
+    token = {
+        "access_token": jwt_access_token_encoded,
+        "refresh_token": jwt_refresh_token_encoded,
+    }
 
-    return jwt_encoded
+    return token
 
 
 class CustomJwtTokenAuthentication(object):
