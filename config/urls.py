@@ -26,7 +26,7 @@ routers = DefaultRouter()
 
 routers.register("accounts", account_views.UserViewSet, basename="accounts")
 routers.register(
-    "token/refersh", account_views.TokenRefreshViewSet, basename="refresh-tokens"
+    "token/refresh", account_views.TokenRefreshViewSet, basename="refresh-tokens"
 )
 
 urlpatterns = [
