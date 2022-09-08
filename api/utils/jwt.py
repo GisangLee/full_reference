@@ -57,6 +57,33 @@ def generate_jwt_token(payload):
     return token
 
 
+def generate_access_token_by_refresh_token(payload: dict) -> dict:
+    SECONDS = 1
+    MINUTE = SECONDS * 60
+    HOUR = MINUTE * 60
+    DAY = HOUR * 24
+    MONTH = DAY * 30
+    YEAR = DAY * 365
+
+    JWT_SECRET = os.environ.get("SECRET_KEY")
+    ALGORITHM = os.environ.get("JWT_ALGORITHM")
+
+    access_token_expire_time = int(time.time()) + (DAY * 7)
+    access_payload = copy.deepcopy(payload)
+
+    access_payload["exp"] = access_token_expire_time
+    access_payload["iat"] = datetime.datetime.now()
+    jwt_access_token_encoded = jwt.encode(
+        access_payload, JWT_SECRET, algorithm=ALGORITHM
+    )
+
+    token = {
+        "access_token": jwt_access_token_encoded,
+    }
+
+    return token
+
+
 class CustomJwtTokenAuthentication(object):
 
     keyword = "jwt"

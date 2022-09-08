@@ -25,6 +25,9 @@ schema_view = get_schema_view(
 routers = DefaultRouter()
 
 routers.register("accounts", account_views.UserViewSet, basename="accounts")
+routers.register(
+    "token/refersh", account_views.TokenRefreshViewSet, basename="refresh-tokens"
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
