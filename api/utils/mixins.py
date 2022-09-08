@@ -33,6 +33,8 @@ class UserBaseViewSet(ModelViewSet):
 
         """
 
+        print(f"요청 메서드 : {self.request.method}")
+
         if (
             self.request.method.lower() == "get"
             or self.request.method.lower() == "post"

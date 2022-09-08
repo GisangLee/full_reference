@@ -87,3 +87,16 @@ class UserProfile(models.Model):
 
     class Meta:
         db_table = "user_profile"
+
+
+class JwtRefreshToken(models.Model):
+    user = models.OneToOneField(
+        User, related_name="refresh_token", on_delete=models.CASCADE
+    )
+    token = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+
+        db_table = "jwt_refresh_token"
