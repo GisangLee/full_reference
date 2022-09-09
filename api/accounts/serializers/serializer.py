@@ -1,9 +1,11 @@
 import logging as log
+import datetime, requests
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
+from django.core.files.base import ContentFile
 from accounts import models as account_models
-from utils.jwt import generate_jwt_token, generate_access_token_by_refresh_token
+from utils.jwt import generate_jwt_token
 
 logger = log.getLogger("django.request")
 
@@ -30,7 +32,10 @@ class ReadUserSerializer(serializers.ModelSerializer):
     def get_profile(self, obj):
         images = obj.profile_images.all()
         images = list(images)
-        return ReadUserProfileSerializer(images[:10], many=True).data
+
+        return ReadUserProfileSerializer(
+            images[:10], many=True, context={"request": self.context.get("request")}
+        ).data
 
     class Meta:
         model = account_models.User
@@ -86,6 +91,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validate_data):
 
+        now = datetime.datetime.now()
+
         logger.debug({"validated_data": validate_data})
 
         user_exists = self.__does_user_exists(validate_data["username"])
@@ -99,8 +106,13 @@ class UserSerializer(serializers.ModelSerializer):
 
         if validate_data["profile"] is not None or validate_data["profile"] != "":
 
-            account_models.UserProfile.objects.create(
-                user=new_user, avatar=validate_data["profile"]
+            image = requests.get(validate_data["profile"])
+
+            user_profile = account_models.UserProfile.objects.create(user=new_user)
+
+            user_profile.avatar.save(
+                f"{validate_data['username']}_profile_images.png",
+                ContentFile(image.content),
             )
 
         new_user.set_password(validate_data["password"])
