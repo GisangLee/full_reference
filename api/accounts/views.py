@@ -77,7 +77,9 @@ class UserViewSet(util_mixins.UserBaseViewSet):
         users = self.filter_queryset(self.get_queryset())
         users = list(users)
 
-        user_json = self.read_serializer_class(users, many=True)
+        user_json = self.read_serializer_class(
+            users, many=True, context={"request": request}
+        )
 
         print(f"list auth : {self.authentication_classes}")
 
