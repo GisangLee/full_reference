@@ -125,9 +125,6 @@ class CustomJwtTokenAuthentication(object):
         self.__JWT_SECRET = os.environ.get("SECRET_KEY")
         self.__ALGORITHM = os.environ.get("JWT_ALGORITHM")
 
-    JWT_SECRET = os.environ.get("SECRET_KEY")
-    ALGORITHM = os.environ.get("JWT_ALGORITHM")
-
     def __get_authorization_header(self, request):
         auth = request.META.get("HTTP_AUTHORIZATION")
         return auth
