@@ -3,8 +3,25 @@ import os, jwt, datetime, time
 from django.contrib.auth import get_user_model
 from rest_framework import exceptions
 import logging as log
+from accounts import models as account_models
 
 logger = log.getLogger("django.request")
+
+# Refresh Token 존재 여부
+def check_prev_refresh_token(user_id):
+
+    try:
+        prev_refresh_token = account_models.JwtRefreshToken.objects.get(
+            user__pk=user_id
+        )
+
+        if prev_refresh_token:
+            return prev_refresh_token.token
+
+    except account_models.JwtRefreshToken.DoesNotExist:
+
+        return False
+
 
 # JWT 발급 시스템
 def generate_jwt_token(payload):
@@ -44,14 +61,28 @@ def generate_jwt_token(payload):
     )
 
     # refresh token 인코딩
-    refresh_payload["exp"] = refresh_token_expire_time
-    refresh_payload["iat"] = datetime.datetime.now()
-    jwt_refresh_token_encoded = jwt.encode(
-        refresh_payload, JWT_SECRET, algorithm=ALGORITHM
-    )
+    refresh_token_exists = check_prev_refresh_token(payload.get("user_id"))
+
+    if not refresh_token_exists:
+
+        refresh_payload["exp"] = refresh_token_expire_time
+        refresh_payload["iat"] = datetime.datetime.now()
+        jwt_refresh_token_encoded = jwt.encode(
+            refresh_payload, JWT_SECRET, algorithm=ALGORITHM
+        )
+
+        token = {
+            "access_token": jwt_access_token_encoded,
+            "refresh_token": jwt_refresh_token_encoded,
+        }
+
+        return token
+
+    refresh_token = refresh_token_exists
+
     token = {
         "access_token": jwt_access_token_encoded,
-        "refresh_token": jwt_refresh_token_encoded,
+        "refresh_token": refresh_token,
     }
 
     return token
