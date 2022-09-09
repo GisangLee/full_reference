@@ -137,18 +137,13 @@ class LoginSerializer(serializers.Serializer):
 
         try:
 
-            exists_refresh_token = account_models.JwtRefreshToken.objects.get(
-                token=refresh_token
-            )
-
-            print(f"exists_refresh_token : {exists_refresh_token}")
+            exists_refresh_token = account_models.JwtRefreshToken.objects.get(user=user)
 
             if exists_refresh_token:
 
                 return exists_refresh_token.pk
 
         except account_models.JwtRefreshToken.DoesNotExist:
-            print(f"없다고?")
             refresh_token_instance = account_models.JwtRefreshToken.objects.create(
                 user=user, token=refresh_token
             )
