@@ -81,11 +81,11 @@ class UserProfile(models.Model):
         null=True,
     )
     avatar = models.ImageField(
-        upload_to="profile_images/%Y/%m/%d", blank=True, null=True
+        upload_to="profile_images/%Y/%m/%d", blank=True, null=True, help_text="이미지 주소"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, help_text="프로필 이미지 생성 일자")
+    updated_at = models.DateTimeField(auto_now=True, help_text="프로필 이미지 수정 일자")
 
     class Meta:
         db_table = "user_profile"
@@ -95,7 +95,7 @@ class JwtRefreshToken(models.Model):
     user = models.OneToOneField(
         User, related_name="refresh_token", on_delete=models.CASCADE
     )
-    token = models.TextField()
+    token = models.TextField(help_text="JWT refresh 토큰")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
